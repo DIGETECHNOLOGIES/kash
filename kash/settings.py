@@ -14,6 +14,8 @@ from pathlib import Path
 
 from datetime import timedelta
 
+from decouple import config
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -47,7 +49,8 @@ INSTALLED_APPS = [
 
 
     #internal apps
-    'user'
+    'user',
+    'shop'
 
 ]
 
@@ -157,7 +160,7 @@ EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = "digetechnologies@gmail.com"
-EMAIL_HOST_PASSWORD = "qnvt frmg eaxu hxhh" 
+EMAIL_HOST_PASSWORD = config('APP_PASSWORD') 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
