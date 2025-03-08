@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success Modal</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.modal {
+    background-color: #fff;
+    border-radius: 8px;
+    max-width: 400px;
+    width: 100%;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    margin-bottom: 20px;
+}
+
+.modal-icon .success {
+    width: 50px;
+    height: 50px;
+    color: #4CAF50;
+}
+
+.modal-icon .failed {
+    width: 50px;
+    height: 50px;
+    color: #e8362a;
+}
+
+
+
+.modal-body h3 {
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.modal-body p {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+
+.modal-footer .btn-continue {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.modal-footer .btn-continue:hover {
+    background-color: #45a049;
+}
+ @media (max-width: 600px) {
+    .modal {
+        max-width: 90%;
+        padding: 15px;
+    }
+    .modal-body h3 {
+        font-size: 1.5rem;
+    }
+    .modal-body p {
+        font-size: 0.9rem;
+    }
+    .modal-footer .btn-continue {
+        padding: 8px 16px;
+    }
+}
+
+    </style>
+</head>
+<body>
+
+    <div class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-icon">
+                    {% if success %}
+                    <svg class="success" xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="none" viewBox="0 0 24 24" stroke="#4CAF50">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3 3L22 4M9 19H6a2 2 0 01-2-2V6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2h-3"/>
+                    </svg>
+                    {%else%}
+
+                    <svg class="failed" xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="none" viewBox="0 0 24 24" stroke="#e8362a">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+
+                    {%endif%}
+                </div>
+            </div>
+            <div class="modal-body">
+                {% if success %}
+                <h3>Account Activated</h3>
+                <p>{{success}}</p>
+                {% else%}
+                <h3>Activation Failed!</h3>
+                <p>{{failed}}</p>
+                {%endif%}
+            </div>
+           
+        </div>
+    </div>
+
+</body>
+</html>

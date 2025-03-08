@@ -1,0 +1,107 @@
+<html>
+  <head>
+    <style>
+      /* Global styles for the email */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        color: #333;
+      }
+      table {
+        width: 100%;
+        border-spacing: 0;
+        border-collapse: collapse;
+      }
+      td {
+        padding: 10px;
+      }
+
+      /* Main container styles */
+      .email-container {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      /* Header section styles */
+      .email-header {
+        background-color: #4CAF50;
+        padding: 20px;
+        text-align: center;
+        color: white;
+      }
+
+      .email-header h1 {
+        margin: 0;
+        font-size: 24px;
+      }
+
+      /* Body section styles */
+      .email-body {
+        padding: 20px;
+        text-align: center;
+      }
+
+      .email-body p {
+        font-size: 16px;
+        margin: 15px 0;
+      }
+
+      .activation-btn {
+        background-color: #4CAF50;
+        color: white;
+        padding: 15px 25px;
+        font-size: 18px;
+        text-decoration: none;
+        border-radius: 5px;
+        display: inline-block;
+        margin-top: 20px;
+      }
+
+      .activation-btn:hover {
+        background-color: #45a049;
+      }
+
+      /* Footer styles */
+      .email-footer {
+        background-color: #f4f4f4;
+        padding: 15px;
+        text-align: center;
+        font-size: 12px;
+        color: #777;
+      }
+    </style>
+  </head>
+  <body>
+    <table>
+      <tr>
+        <td>
+          <div class="email-container">
+            <!-- Email Header -->
+            <div class="email-header">
+              <h1>Welcome to Kash!</h1>
+            </div>
+            <!-- Email Body -->
+            <div class="email-body">
+              <p>Dear {{ username }},</p>
+              <p>Thank you for registering with Kash. Please click the button below to activate your account:</p>
+              <a href="{{ activation_link }}" class="activation-btn">Activate Account</a>
+              <p>This link will expire in 10 minutes</p>
+              <p>If you didn't request this, please ignore this email.</p>
+            </div>
+            <!-- Email Footer -->
+            <div class="email-footer">
+              <p>&copy; 2025 Kash. All rights reserved.</p>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
