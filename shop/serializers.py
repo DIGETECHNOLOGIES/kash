@@ -53,6 +53,30 @@ class ShopCreationSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({'creation':'Error occured in creating shop. Please try again'})
         
         return shop
+    
+class ShopSerializer(serializers.ModelSerializer):
+    
+
+    class Meta:
+        model = Shop
+        fields = [
+            'name',
+            'location'
+        ]
+    
+
+class ItemSerializer(serializers.ModelSerializer):
+    shop = ShopSerializer(read_only = True)
+
+    class Meta:
+        model = Item
+        fields = [
+            'shop',
+            'name',
+            'images',
+            'location'
+
+        ]
 
 class OrderSerializer(serializers.ModelSerializer):
     item = serializers.PrimaryKeyRelatedField(queryset = Item.objects.all())
@@ -89,6 +113,19 @@ class OrderSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({'Order':'Error placing order. Please try again'})
         
         return order
+
+class OrderViewSerializer(serializers.ModelSerializer):
+    item = ItemSerializer(read_only = True)
+
+    class Meta:
+        model = Order
+        fields = [
+            'buyer',
+            'item',
+            'total',
+            'quantity',
+            'delivered'
+        ]
 
         
 
