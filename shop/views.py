@@ -4,8 +4,8 @@ from rest_framework import generics
 from rest_framework import status
 
 #serializers
-from .serializers import ShopCreationSerializer, OrderSerializer, OrderViewSerializer
-from .models import Order
+from .serializers import ShopCreationSerializer, OrderSerializer, OrderViewSerializer, ItemViewSerializer
+from .models import Order, Item
 
 # Create your views here.
 class VerifyShop(generics.CreateAPIView):
@@ -52,3 +52,38 @@ class SellOrderView(generics.ListAPIView):
         shop_id = self.kwargs['shop_id']
         qs = Order.objects.filter(item_id = shop_id)
         return qs
+
+
+class ConfirmDelivery(generics.RetrieveUpdateAPIView):
+
+    def get_object(self):
+        user = self.request.user
+        order_id = self.kwargs['order_id']
+        try:
+
+         return Order.objects.get(buyer = user, id = order_id)
+        except:
+            return None
+
+
+    def update(self, request, *args, **kwargs):
+        order = self.get_object()
+        if order:
+            order.delivered = True
+            order.save()
+
+            return Response(
+                {
+                    'success':'Item delivered successfully',
+                }
+            )
+        return Response(
+                {
+                    'failed':'Order not found',
+                    
+                }
+            )
+    
+class ViewItems(generics.ListAPIView):
+    serializer_class = ItemViewSerializer
+    queryset = Item.objects.all()

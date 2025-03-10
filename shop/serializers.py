@@ -18,6 +18,11 @@ def mail(name, user):
         recipient_list= [recipient]
     )
 
+class LocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Location
+        fields = '__all__'
+
 
 class ShopCreationSerializer(serializers.ModelSerializer):
     name = serializers.CharField(write_only = True)
@@ -56,7 +61,7 @@ class ShopCreationSerializer(serializers.ModelSerializer):
     
 class ShopSerializer(serializers.ModelSerializer):
     
-
+    location = LocationSerializer(read_only = True)
     class Meta:
         model = Shop
         fields = [
@@ -67,6 +72,7 @@ class ShopSerializer(serializers.ModelSerializer):
 
 class ItemSerializer(serializers.ModelSerializer):
     shop = ShopSerializer(read_only = True)
+    location = LocationSerializer(read_only = True)
 
     class Meta:
         model = Item
@@ -127,6 +133,18 @@ class OrderViewSerializer(serializers.ModelSerializer):
             'delivered'
         ]
 
+
+
+
+
+class ItemViewSerializer(serializers.ModelSerializer):
+    shop = ShopSerializer(read_only = True)
+    location = LocationSerializer(read_only = True)
+
+
+    class Meta:
+        model = Item
+        fields = '__all__'
         
 
 

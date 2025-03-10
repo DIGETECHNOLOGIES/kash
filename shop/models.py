@@ -47,7 +47,8 @@ class Item(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     sub_category = models.ForeignKey(SubCategory, on_delete=models.SET_NULL, null=True)
     
-    
+    # class Meta:
+        # ordering = []
     def __str__(self):
         return self.name
     
