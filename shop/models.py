@@ -21,7 +21,13 @@ class Account(models.Model):
     pending_balance = models.PositiveIntegerField(default=0)
 
 class Category(models.Model):
-    name = models.CharField(max_length=200)
+    CATEGORY_CHOICE=[('electronics', 'Electronics'),
+        ('fashion', 'Fashion'),
+        ('home', 'Home & Kitchen'),
+        ('books', 'Books'),
+        ('other', 'Other'),]
+
+    name = models.CharField(max_length=255,choices=CATEGORY_CHOICE,default='other')
 
     def __str__(self):
         return self.name
@@ -47,8 +53,7 @@ class Item(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     sub_category = models.ForeignKey(SubCategory, on_delete=models.SET_NULL, null=True)
     
-    # class Meta:
-        # ordering = []
+    
     def __str__(self):
         return self.name
     
