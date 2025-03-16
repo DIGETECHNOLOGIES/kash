@@ -80,11 +80,22 @@ MIDDLEWARE = [
 ]
 
 
-CORS_ALLOWED_ORIGINS = [
-    "https://payunit.net",
-    "https://gateway.payunit.net", 
-    # "https://yourdomain.com",
+# CORS_ALLOWED_ORIGINS = [
+#     "https://payunit.net",
+#     "https://gateway.payunit.net", 
+#     # "https://yourdomain.com",
+# ]
+
+CORS_ALLOW_ALL_ORIGINS = True  # Allows all origins
+CORS_ALLOW_METHODS = [
+    "GET",
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+    "OPTIONS"
 ]
+
 
 ROOT_URLCONF = 'kash.urls'
 
