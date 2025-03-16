@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Payment Data</title>
+</head>
+<body>
+    <h2>Sending Payment Data...</h2>
+    <div id="response"></div>
+    
+    <script>
+        const paymentData = {
+            "status": "SUCCES",
+            "statusCode": 200,
+            "message": "payment has been collected",
+            "data": {
+                "transaction_amount": 90000,
+                "transaction_status": "SUCCESSFUL",
+                "transaction_id": "98d6155228",
+                "purchaseRef": null,
+                "notify_url": "https://domaine.com/api/transaction/callback",
+                "callback_url": "https://domaine.com",
+                "transaction_currency": "XAF",
+                "transaction_gateway": null,
+                "message": "payment has been collected"
+            }
+        };
+
+        async function sendPaymentData() {
+            try {
+                // const url = "https://kash-133m.onrender.com/shop/transaction/callback/"
+                const url = "http://127.0.0.1:8000/shop/transaction/callback/"
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(paymentData)
+                });
+                const result = await response.json();
+                document.getElementById("response").innerText = JSON.stringify(result, null, 2);
+            } catch (error) {
+                document.getElementById("response").innerText = "Error: " + error;
+            }
+        }
+        
+        sendPaymentData();
+    </script>
+</body>
+</html>
