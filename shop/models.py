@@ -22,7 +22,13 @@ class Account(models.Model):
     pending_balance = models.PositiveIntegerField(default=0)
 
 class Category(models.Model):
-    name = models.CharField(max_length=200)
+    CATEGORY_CHOICE=[('electronics', 'Electronics'),
+        ('fashion', 'Fashion'),
+        ('home', 'Home & Kitchen'),
+        ('books', 'Books'),
+        ('other', 'Other'),]
+
+    name = models.CharField(max_length=255,choices=CATEGORY_CHOICE,default='other')
 
     def __str__(self):
         return self.name
@@ -42,14 +48,13 @@ class Item(models.Model):
     shop = models.ForeignKey(Shop, null=True, on_delete=models.SET_NULL)
     description = models.TextField(null = True)
     images = models.ManyToManyField(Image)
-    location = models.ForeignKey(Location,  on_delete=models.CASCADE)
+    location = models.ForeignKey(Location,  on_delete=models.CASCADE,null=True,blank=True)
     previous_price = models.PositiveIntegerField(null=True)
     current_price = models.PositiveIntegerField(default=0)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     sub_category = models.ForeignKey(SubCategory, on_delete=models.SET_NULL, null=True)
     
-    # class Meta:
-        # ordering = []
+    
     def __str__(self):
         return self.name
     
