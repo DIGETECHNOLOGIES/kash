@@ -81,7 +81,8 @@ MIDDLEWARE = [
 
 
 CORS_ALLOWED_ORIGINS = [
-    "https://payunit.com", 
+    "https://payunit.net",
+    "https://gateway.payunit.net", 
     # "https://yourdomain.com",
 ]
 
