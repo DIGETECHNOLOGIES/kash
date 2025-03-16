@@ -16,8 +16,16 @@ from datetime import timedelta
 
 from decouple import config
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+import os
+
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -44,13 +52,17 @@ INSTALLED_APPS = [
 
     #Third party apps
     'rest_framework',
+    'storages',
     # 'corsheaders',
     'rest_framework_simplejwt',
+    'django_filters',
+    'corsheaders',
 
 
     #internal apps
     'user',
-    'shop'
+    'shop',
+    'messaging',
 
 ]
 
@@ -61,9 +73,16 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+
+CORS_ALLOWED_ORIGINS = [
+    "https://payunit.com", 
+    # "https://yourdomain.com",
 ]
 
 ROOT_URLCONF = 'kash.urls'
@@ -94,8 +113,31 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        'OPTIONS': {
+    'timeout': 30,  # Set to 30 seconds
+        }
     }
+    
 }
+
+# STORAGES = {
+#     "default": {
+#         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+#     },
+#     "staticfiles": {
+#         "BACKEND": "storages.backends.s3boto3.S3StaticStorage",
+#     },
+# }
+
+
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY')
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_KEY')
+AWS_STORAGE_BUCKET_NAME = config('AWS_S3_BUCKET_NAME')
+AWS_S3_REGION_NAME = "eu-north-1" 
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com'
+
+# DEFAULT_FILE_STORAGE = "storages.backends.s3.S3Storage"
+
 
 
 # Password validation
@@ -132,7 +174,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+
+# STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
+# MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+STATIC_URL ='static/'
+
+STATICFILES_STORAGE = "storages.backends.s3.S3Storage"
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

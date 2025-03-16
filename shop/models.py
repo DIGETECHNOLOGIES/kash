@@ -5,9 +5,10 @@ from user.models import User, Location
 class Shop(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(null=False, max_length=200)
+    image= models.ImageField(upload_to='shop/', null=True)
     location = models.ForeignKey(Location, related_name="shop_location", on_delete=models.SET_NULL, null=True)
     workers = models.ManyToManyField(User, related_name="shop_workers")
-    owner_image = models.ImageField(upload_to='shop_profiles/', null=True)
+    owner_image = models.ImageField(upload_to='shop_owners/', null=True)
     IDCard = models.ImageField(upload_to='IDcards/', null=True)
     is_verified = models.BooleanField(default=False)
 
@@ -59,6 +60,9 @@ class Order(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     total = models.PositiveIntegerField(default=0)
     delivered = models.BooleanField(default=False)
+    number = models.CharField(default="0", max_length=9)
+    payment_id = models.CharField(max_length=20, default='1111111111')
+    payment_status = models.CharField(default='pending', max_length=20)
 
 
     def __str__(self):
