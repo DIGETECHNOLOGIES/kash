@@ -50,7 +50,6 @@ def confirm_payment(number , amount , id ):
     auth_string = f"{api_key}:{api_secret}"
     auth_encoded = base64.b64encode(auth_string.encode()).decode()
 
-    # Define headers
     headers = {
         "x-api-key": config('API_KEY'),
         "mode": "live",
@@ -64,7 +63,6 @@ def confirm_payment(number , amount , id ):
         "gateway": "CM_MTNMOMO", 
         "amount": amount,
         "transaction_id": f'{id}',  
-        # "return_url": "https://my.website.com/payunit/return",
         "phone_number": str(number),  
         "currency": "XAF",
         "paymentType": "ussd",
@@ -80,3 +78,36 @@ def confirm_payment(number , amount , id ):
     print(response.status_code)
     print(response.json())  
     return response
+
+def verify_payment(id):
+    api_key = config('API_USER')
+    api_secret = config('API_PASSWORD')
+
+    auth_string = f"{api_key}:{api_secret}"
+    auth_encoded = base64.b64encode(auth_string.encode()).decode()
+
+    base_url = "https://gateway.payunit.net"
+    transaction_id = str(id)
+
+    url = f"{base_url}/api/gateway/paymentstatus/{transaction_id}"
+
+    headers = {
+        "x-api-key": config('API_KEY'),
+        "mode": "live",
+        "Content-Type": "application/json",
+        "Authorization": f"Basic {auth_encoded}"
+    }
+
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status() 
+        
+        print("Status Code:", response.status_code)
+        print("Response JSON:", response.json())  
+
+        return response.json()  
+    
+    except requests.exceptions.RequestException as e:
+        print("Error:", e)
+        return {"error": str(e)} 
+
