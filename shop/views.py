@@ -13,6 +13,9 @@ from django.conf import settings
 from .serializers import ShopCreationSerializer, OrderSerializer, OrderViewSerializer, ItemViewSerializer, ShopSerializer
 from .models import Order, Item, Account, Shop
 
+
+from .payment import verify_payment
+
 # Create your views here.
 class VerifyShop(generics.CreateAPIView):
     serializer_class = ShopCreationSerializer
@@ -37,33 +40,31 @@ class PlaceOrder(generics.CreateAPIView):
         serializer.is_valid(raise_exception = True)
         serializer.save()
         return Response({
-            'success':'Order placed successfully. Proceed to do payments'
+            'success':'Order placed successfully. Dial *126# and confirm payment then click the Confirm Pay button below'
         },  status=status.HTTP_201_CREATED)
 
 
 class PaymentConfirmation(APIView):
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
 
-    def post(self, request):
-        # with transaction.atomic():
-        try:
-            data = request.data
-            print(data)
-
-            transaction_id = data.get('data', {}).get('transaction_id')
-            status = data.get('data', {}).get('transaction_status')
-            # amount = data.get('data', {}).get('transaction_amount')
-            # currency = data.get('data', {}).get('transaction_currency')
-            message = data.get('data', {}).get('message')
+    def get(self, request, id):
+        
+            data = verify_payment(id = id)
+            data = data.get('data')
+            transaction_id = data.get('transaction_id')
+            status = data.get("transaction_status", "UNKNOWN")
+            print('status', status)
+            message = data.get('message')
             order = Order.objects.get(payment_id = transaction_id)
             order.payment_status = status
             order.save()
             print('order is ',order.item.shop.owner.email)
             
-            if status == 'SUCCESSFUL':
+            if status == 'SUCCESS':
                 account = Account.objects.get(shop__id = order.item.shop.id)
                 account.pending_balance += int(order.total)
                 account.save()
+                print('here')
                 print('account is ',account)
                 subject = f'Order placed for {order.item}'
                 message = f'An order has been placed for {order.quantity} quantity of {order.item.name}'
@@ -74,8 +75,16 @@ class PaymentConfirmation(APIView):
                     recipient_list=[order.item.shop.owner.email], 
                     from_email=settings.DEFAULT_FROM_EMAIL,
                     )
-                return Response({"message": "Transaction updated successfully"}, status=200)
-            return Response({"message": "Transaction failed"}, status=400)
+                return Response({"Success": "Payment completed"}, status=200)
+            if status == 'FAILED':
+
+                return Response({"Failed": "Payment failed, please place order again "}, status=200)
+            
+
+            if status == 'PENDING':
+                return Response({"Pending": "Payment pending. Please dial *126# and confirm payment then click the confirm Pay button bellow"}, status=200)
+           
+            return Response({"Not_Found": "Order Not found"}, status=404)
                     
                     
 
@@ -84,10 +93,10 @@ class PaymentConfirmation(APIView):
                 #     return Response(
                 #         {'error':f'Error sending mail: {e}'}
                 #     )
-        except Exception as e:
-            return Response({
-                'error':f'Internal server error'
-            })
+        # except Exception as e:
+        #     return Response({
+        #         'error':f'Internal server error'
+        #     })
 
 
 
