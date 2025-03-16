@@ -1,4 +1,5 @@
 from .models import Item
+from shop.models import Category,Location,Image
 from rest_framework import serializers
 
 class PriceValidator:
@@ -8,17 +9,13 @@ class PriceValidator:
         return value
 
 class ItemSerializer(serializers.ModelSerializer):
-    CATEGORY_CHOICE=[('electronics', 'Electronics'),
-        ('fashion', 'Fashion'),
-        ('home', 'Home & Kitchen'),
-        ('books', 'Books'),
-        ('other', 'Other'),]
+    id=serializers.IntegerField(read_only=True)
     name=serializers.CharField(max_length=255,)
     description=serializers.CharField(max_length=255,)
-    location=serializers.CharField(max_length=255,)
-    category=serializers.ChoiceField(choices=CATEGORY_CHOICE,default='other')
-    price=serializers.DecimalField(max_digits=10,decimal_places=0,validators=[PriceValidator()])
-    image=serializers.ImageField(required=False)
+    location=serializers.StringRelatedField(required=False,allow_null=True)
+    category=serializers.StringRelatedField()
+    current_price=serializers.DecimalField(max_digits=10,decimal_places=0,validators=[PriceValidator()])
+    images=serializers.ImageField()
     class Meta:
         model=Item
-        fields=['name','price','description','location','category','image']
+        fields=['id','name','current_price','description','location','category','images']

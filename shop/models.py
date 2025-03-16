@@ -47,7 +47,7 @@ class Item(models.Model):
     shop = models.ForeignKey(Shop, null=True, on_delete=models.SET_NULL)
     description = models.TextField(null = True)
     images = models.ManyToManyField(Image)
-    location = models.ForeignKey(Location,  on_delete=models.CASCADE)
+    location = models.ForeignKey(Location,  on_delete=models.CASCADE,null=True,blank=True)
     previous_price = models.PositiveIntegerField(null=True)
     current_price = models.PositiveIntegerField(default=0)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
