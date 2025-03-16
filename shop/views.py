@@ -52,15 +52,15 @@ class PaymentConfirmation(APIView):
 
             transaction_id = data.get('data', {}).get('transaction_id')
             status = data.get('data', {}).get('transaction_status')
-            amount = data.get('data', {}).get('transaction_amount')
-            currency = data.get('data', {}).get('transaction_currency')
+            # amount = data.get('data', {}).get('transaction_amount')
+            # currency = data.get('data', {}).get('transaction_currency')
             message = data.get('data', {}).get('message')
             order = Order.objects.get(payment_id = transaction_id)
             order.payment_status = status
             order.save()
             print('order is ',order.item.shop.owner.email)
             
-            if status == 'SUCCESS':
+            if status == 'SUCCESSFUL':
                 account = Account.objects.get(shop__id = order.item.shop.id)
                 account.pending_balance += int(order.total)
                 account.save()
@@ -75,6 +75,7 @@ class PaymentConfirmation(APIView):
                     from_email=settings.DEFAULT_FROM_EMAIL,
                     )
                 return Response({"message": "Transaction updated successfully"}, status=200)
+            return Response({"message": "Transaction failed"}, status=400)
                     
                     
 
