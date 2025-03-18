@@ -11,7 +11,7 @@ class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default = uuid.uuid4, editable=False)
     email = models.EmailField(null=False, unique=True)
     image = models.ImageField(upload_to='profiles')
-    number = models.CharField(max_length=20, null=True)
+    number = models.DecimalField(max_digits=9,decimal_places=0, null=True)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
     # location = models.CharField(max_length=200, null=True)
 

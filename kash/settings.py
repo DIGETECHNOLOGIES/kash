@@ -63,7 +63,7 @@ INSTALLED_APPS = [
     'user',
     'shop',
     'messaging',
-
+    'item'
 ]
 
 AUTH_USER_MODEL = 'user.User'
@@ -203,7 +203,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES':[
-        'rest_framework_simplejwt.authentication.JWTAuthentication'
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        
     ],
 
     'DEFAULT_PERMISSION_CLASSES': [
@@ -215,7 +216,7 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days = 30)
 }
 
-
+APP_PASSWORD='password123'
 #email configuration
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
