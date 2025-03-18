@@ -11,6 +11,9 @@ pillow = "*"
 requests = "*"
 django-cors-headers = "*"
 python-decouple = "*"
+storage = "*"
+django-storages = "*"
+django-filter = "*"
 
 [dev-packages]
 
