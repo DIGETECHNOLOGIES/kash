@@ -19,7 +19,7 @@ from .payment import verify_payment
 # Create your views here.
 class VerifyShop(generics.CreateAPIView):
     serializer_class = ShopCreationSerializer
-    # permission_classes = []
+    permission_classes = []
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data = request.data)
@@ -161,10 +161,10 @@ class ViewItems(generics.ListAPIView):
     serializer_class = ItemViewSerializer
     queryset = Item.objects.all()
 
-    def get_queryset(self):
+    # def get_queryset(self):
 
-        qs= Item.objects.filter(shop__is_verified = True)
-        return qs
+        # qs= Item.objects.filter(shop__is_verified = True)
+        # return qs
 
 
 class SearchItems(viewsets.ModelViewSet):
