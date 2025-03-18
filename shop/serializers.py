@@ -40,7 +40,6 @@ class ImageSerializer(serializers.ModelSerializer):
     def get_url(self, obj):
         request = self.context.get('request') 
         if obj.url and request:
-            # return obj.url
             return request.build_absolute_uri(obj.url)
         return None
 

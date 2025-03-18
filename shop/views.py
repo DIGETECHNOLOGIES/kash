@@ -161,10 +161,10 @@ class ViewItems(generics.ListAPIView):
     serializer_class = ItemViewSerializer
     queryset = Item.objects.all()
 
-    def get_queryset(self):
+    # def get_queryset(self):
 
-        qs= Item.objects.filter(shop__is_verified = True)
-        return qs
+        # qs= Item.objects.filter(shop__is_verified = True)
+        # return qs
 
 
 class SearchItems(viewsets.ModelViewSet):

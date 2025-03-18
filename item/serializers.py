@@ -2,6 +2,7 @@ from .models import Item
 from shop.models import Category,Location,Image
 from rest_framework import serializers
 from django.core.exceptions import ValidationError
+# from shop.serializers import ImageSerializer
 
 class PriceValidator:
     def __call__(self, value):
@@ -15,16 +16,28 @@ def validate_image_size(image):
         raise serializers.ValidationError("Each image size must not exceed 2MB")
     return image
 
+
+class ImageSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Image  
+        fields = ['url']
+
+    def get_url(self, obj):
+        request = self.context.get('request') 
+        if obj.image.url and request:
+            return request.build_absolute_uri(obj.image.url)
+        return None
+
+
 class ItemSerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=255)
     description = serializers.CharField(max_length=255)
     location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
     category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())
     current_price = serializers.DecimalField(max_digits=10, decimal_places=0, validators=[PriceValidator()])
-    images = serializers.ListField(
-        child=serializers.ImageField(validators=[validate_image_size]),
-        write_only=True
-    )
+    images = ImageSerializer(many = True, required = False)
 
     class Meta:
         model = Item
