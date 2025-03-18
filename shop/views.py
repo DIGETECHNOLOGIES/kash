@@ -19,7 +19,7 @@ from .payment import verify_payment
 # Create your views here.
 class VerifyShop(generics.CreateAPIView):
     serializer_class = ShopCreationSerializer
-    # permission_classes = []
+    permission_classes = []
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data = request.data)
