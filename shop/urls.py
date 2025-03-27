@@ -10,7 +10,7 @@ urlpatterns = [
     path('buyer-orders/', views.BuyOrderView.as_view()),
     path('seller-orders/<str:shop_id>/', views.SellOrderView.as_view()),
     path('confirm-delivery/<str:order_id>/', views.ConfirmDelivery.as_view()),
-    path('items/', views.ViewItems.as_view()),
+    #path('items/', views.ViewItems.as_view()),
     path('items-filter/', views.SearchItems.as_view({'get':'list'})),
     path('shop-details/<str:id>/', views.ShopView.as_view()),
     path('transaction_status/<str:id>/', views.PaymentConfirmation.as_view()),
