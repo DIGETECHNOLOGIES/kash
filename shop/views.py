@@ -10,8 +10,8 @@ from django.core.mail import send_mail
 from django.conf import settings
 
 #serializers
-from .serializers import ShopCreationSerializer, OrderSerializer, OrderViewSerializer, ItemViewSerializer, ShopSerializer
-from .models import Order, Item, Account, Shop
+from .serializers import ShopCreationSerializer, OrderSerializer, OrderViewSerializer, ItemViewSerializer, ShopSerializer, WithdrawalRequestSerializer
+from .models import Order, Item, Account, Shop, Withdrawal
 
 
 from .payment import verify_payment
@@ -181,3 +181,38 @@ class ShopView(generics.RetrieveAPIView):
     serializer_class = ShopSerializer
     queryset = Shop.objects.all()
     lookup_field = 'id'
+
+class WithdrawalRequest(generics.ListCreateAPIView):
+    serializer_class = WithdrawalRequestSerializer
+    permission_classes = []
+    
+
+    def get_queryset(self):
+        id = self.kwargs['id']
+        qs = Withdrawal.objects.filter(shop__id = id)
+        return qs
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data = request.data)
+        serializer.is_valid(raise_exception = True)
+        serializer.save()
+        return Response(
+            {
+                'success':'Withdrawal request placed successfully'
+            }, status=status.HTTP_201_CREATED
+        )
+    
+    def get_serializer_context(self):
+        context =  super().get_serializer_context()
+        context['id'] = self.kwargs['id']
+        return context
+
+
+
+#  def create(self, request, *args, **kwargs):
+#         serializer = self.get_serializer(data = request.data)
+#         serializer.is_valid(raise_exception = True)
+#         serializer.save()
+#         return Response({
+#             'success':'Order placed successfully. Dial *126# and confirm payment then click the Confirm Pay button below'
+#         },  status=status.HTTP_201_CREATED)

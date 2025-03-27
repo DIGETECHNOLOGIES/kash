@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.db import transaction
 from django.core.mail import send_mail
 from django.conf import settings
-from .models import Shop, User, Location, Account, Item, Order, Image
+from .models import Shop, User, Location, Account, Item, Order, Image, Withdrawal
 from .validators import validate_image, validate_quantity
 from user.validators import validate_number
 import uuid
@@ -201,7 +201,39 @@ class ItemViewSerializer(serializers.ModelSerializer):
         fields = '__all__'
         
 
-             
+
+class WithdrawalRequestSerializer(serializers.ModelSerializer):
+    status = serializers.CharField(required = False)
+    number = serializers.CharField(validators = [validate_number])
+    class Meta:
+
+        model = Withdrawal
+        fields = ['id', 'number', 'amount', 'status']
+
+    def create(self, validated_data):
+        id = self.context.get('id')
+        shop = Shop.objects.get(id = id)
+        validated_data['shop'] = shop
+        validated_data['status'] = 'Pending'
+        account = Account.objects.get(shop__id = id)
+        amount = validated_data.get('amount')
+        if int(amount) <= int(account.available_balance) and int(amount) >= 1000:
+            withdrawal = Withdrawal.objects.create(**validated_data)
+            account.available_balance -= int(amount)
+            account.save()
+            send_mail(
+                message=f'A withdrawal request has been made by {account.shop}',
+                subject='KASH withdrawal',
+                recipient_list=[settings.DEFAULT_FROM_EMAIL],
+                from_email=settings.DEFAULT_FROM_EMAIL
+
+            )
+            return withdrawal
+        elif int(amount) < 1000:
+            raise serializers.ValidationError({'amount':'Amount is less than minimum withdrawal of 1000frs'})
+        else:
+            raise serializers.ValidationError({'amount':'Amount is more than available balance'})
+
 
 
 

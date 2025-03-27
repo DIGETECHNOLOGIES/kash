@@ -21,6 +21,10 @@ class Account(models.Model):
     available_balance = models.PositiveIntegerField(default=0)
     pending_balance = models.PositiveIntegerField(default=0)
 
+
+    def __str__(self):
+        return self.shop.name
+
 class Category(models.Model):
     CATEGORY_CHOICE=[('electronics', 'Electronics'),
         ('fashion', 'Fashion'),
@@ -67,7 +71,7 @@ class Order(models.Model):
     delivered = models.BooleanField(default=False)
     number = models.CharField(default="0", max_length=9)
     payment_id = models.CharField(max_length=20, default='1111111111')
-    payment_status = models.CharField(default='pending', max_length=20)
+    payment_status = models.CharField(default='Pending', max_length=20)
 
 
     def __str__(self):
@@ -76,3 +80,20 @@ class Order(models.Model):
     def save(self, *args, **kwargs):
         self.total = self.quantity * self.item.current_price
         super().save(*args, **kwargs)
+
+
+class Withdrawal(models.Model):
+    shop = models.ForeignKey(Shop, related_name='withdraw', on_delete=models.CASCADE)
+    amount = models.PositiveIntegerField()
+    number = models.CharField(max_length= 20)
+    service = models.CharField(max_length=20, default="MTN")
+    status = models.CharField(max_length=20, default="Pending")
+
+
+    def __str__(self):
+        return f'{self.shop.name}:{self.id}'
+    
+
+
+# class Refund(models.Model):
+    # order = models.
