@@ -23,6 +23,6 @@ urlpatterns = [
     path('user/', include('user.urls')),
     path('shop/', include('shop.urls')),
     path('message/', include('messaging.urls')),
-    #path('item/',include('item.urls')),
-    path('items',views.ItemList.as_view()),
+    path('item/',include('item.urls')),
+    # path('items',views.ItemList.as_view()),
 ]

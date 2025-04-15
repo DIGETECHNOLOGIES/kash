@@ -14,5 +14,6 @@ urlpatterns = [
     path('items-filter/', views.SearchItems.as_view({'get':'list'})),
     path('shop-details/<str:id>/', views.ShopView.as_view()),
     path('transaction_status/<str:id>/', views.PaymentConfirmation.as_view()),
-    path('withdraw/<str:id>/', views.WithdrawalRequest.as_view())
+    path('withdraw/<str:id>/', views.WithdrawalRequest.as_view()),
+    path('transaction/callback/', views.PaymentNotification.as_view()),
 ]

@@ -26,7 +26,7 @@ def initiate_payment(amount , id):
         "currency": "XAF",
         "transaction_id": f'{id}',
         # "return_url": "https://webhook.site/d457b2f3-dd71-4f04-9af5-e2fcf3be8f34",
-        # "notify_url": "https://kash-133m.onrender.com/shop/transaction/callback/",
+        "notify_url": "https://kash-133m.onrender.com/shop/transaction/callback/",
         "payment_country": "CM"
     }
 
