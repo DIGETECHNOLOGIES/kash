@@ -223,18 +223,54 @@ class PaymentNotification(APIView):
 
     def post(self, request):
         res = request.data
-        print(res)
-        send_mail(
-            message= f'{res}',
-            subject='payment_confirm',
-            # from_email=''
-            from_email = settings.DEFAULT_FROM_EMAIL,
-            recipient_list = [settings.DEFAULT_FROM_EMAIL],
+        # print(res)
+        # send_mail(
+        #     message= f'{res}',
+        #     subject='payment_confirm',
+        #     # from_email=''
+        #     from_email = settings.DEFAULT_FROM_EMAIL,
+        #     recipient_list = [settings.DEFAULT_FROM_EMAIL],
 
-        )
+        # )
 
-        return Response({
-            'email sent':f'{res} email has been sent'
-        },  status=status.HTTP_201_CREATED)
+        # return Response({
+        #     'email sent':f'{res} email has been sent'
+        # },  status=status.HTTP_201_CREATED)
+        data = request.data
+        # data = data.get('data')
+        transaction_id = data.get('transaction_id')
+        status = data.get("transaction_status", "UNKNOWN")
+        print('status', status)
+        # message = data.get('message')
+        order = Order.objects.get(payment_id = transaction_id)
+        order.payment_status = status
+        order.save()
+        print('order is ',order.item.shop.owner.email)
+        
+        if status == 'SUCCESSFUL':
+            account = Account.objects.get(shop__id = order.item.shop.id)
+            account.pending_balance += int(order.total)
+            account.save()
+            print('here')
+            print('account is ',account)
+            subject = f'Order placed for {order.item}'
+            message = f'An order has been placed for {order.quantity} quantity of {order.item.name}'
+            # try:
+            send_mail(
+                subject=subject,
+                message=message,
+                recipient_list=[order.item.shop.owner.email], 
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                )
+            return Response({"Success": "Payment completed"}, status=200)
+        if status == 'FAILED':
+
+            return Response({"Failed": "Payment failed, please place order again "}, status=200)
+        
+
+        if status == 'PENDING':
+            return Response({"Pending": "Payment pending. Please dial *126# and confirm payment then click the confirm Pay button bellow"}, status=200)
+        
+        return Response({"Not_Found": "Order Not found"}, status=404)
 
 
