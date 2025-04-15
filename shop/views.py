@@ -216,3 +216,25 @@ class WithdrawalRequest(generics.ListCreateAPIView):
 #         return Response({
 #             'success':'Order placed successfully. Dial *126# and confirm payment then click the Confirm Pay button below'
 #         },  status=status.HTTP_201_CREATED)
+
+class PaymentNotification(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def post(self, request):
+        res = request.data
+        print(res)
+        send_mail(
+            message= f'{res}',
+            subject='payment_confirm',
+            # from_email=''
+            from_email = settings.DEFAULT_FROM_EMAIL,
+            recipient_list = [settings.DEFAULT_FROM_EMAIL],
+
+        )
+
+        return Response({
+            'email sent':f'{res} email has been sent'
+        },  status=status.HTTP_201_CREATED)
+
+
