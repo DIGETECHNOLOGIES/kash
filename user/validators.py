@@ -28,8 +28,8 @@ def validate_number(value):
     if len(value) != 9:
         raise serializers.ValidationError('number is not correct')
     print(value[:2])
-    if str(value[:2]) != '67' and str(value[:2]) != '65' and str(value[:2]) != '69':
-        raise serializers.ValidationError('number is not correct ')
+    if str(value[:2]) != '67' and str(value[:2]) != '65' and str(value[:2]) != '69' and str(value[:2]) != '68' and str(value[:2]) != '62':
+        raise serializers.ValidationError('number is not a Cameroon number ')
     try:
         int(value)
         return value
