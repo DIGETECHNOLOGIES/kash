@@ -1,4 +1,4 @@
-# Payment API Documentation
+# Payment API Documentations
 
 ## **1. Verify Payment Status**
 **Endpoint:**  
