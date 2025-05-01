@@ -7,7 +7,7 @@ from.models import User
 def validate_email(value):
     qs = User.objects.filter(email__exact = value)
     if qs.exists():
-        raise serializers.ValidationError(f' account with email {value} already exixts')
+        raise serializers.ValidationError(f'Account with email {value} already exists')
     return value
 
 def validate_password(value):
@@ -20,9 +20,10 @@ def validate_password(value):
         return value
     
 def validate_username(value):
-    qs = User.objects.filter(username = value)
-    if qs.exists():
-        raise serializers.ValidationError(f'User with username {value} already exists')
+    # qs = User.objects.filter(username = value)
+    # if qs.exists():
+    #     raise serializers.ValidationError(f'User with username {value} already exists')
+    pass
 
 def validate_number(value):
     if len(value) != 9:

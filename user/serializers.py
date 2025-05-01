@@ -9,6 +9,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
+# from shop.serializers import LocationSerializer
 from .tokens import account_activation_token
 
 def email(user_email, username, user, request):
@@ -35,13 +36,13 @@ def email(user_email, username, user, request):
 class CreateUserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True, validators=[validate_email])
     username = serializers.CharField(write_only=True, required=True, validators=[validate_username])
-    number = serializers.CharField(write_only=True, required=True, validators=[validate_number])
+    # number = serializers.CharField(write_only=True, required=True, validators=[validate_number])
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     password2 = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'number', 'password', 'password2']
+        fields = ['username', 'email', 'password', 'password2']
 
     def validate(self, data):
         if data['password'] != data['password2']:
@@ -60,9 +61,17 @@ class CreateUserSerializer(serializers.ModelSerializer):
                 email(user.email, user.username, user=user, request=request)
                 user.save()
             except Exception as e:
-                raise serializers.ValidationError({'Email': f'Error sending email: {str(e)}'})
+                raise serializers.ValidationError({'message': f'Error sending email: {str(e)}'})
 
         return user
+
+class UserViewSerializer(serializers.ModelSerializer):
+    # location = LocationSerializer()
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'image', 'number', 'location', 'username']
+
+
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.CharField()

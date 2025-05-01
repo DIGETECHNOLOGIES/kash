@@ -10,11 +10,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RenameField(
-            model_name='account',
-            old_name='balance',
-            new_name='available_balance',
-        ),
+        # migrations.RenameField(
+        #     model_name='account',
+        #     old_name='balance',
+        #     new_name='available_balance',
+        # ),
         migrations.AddField(
             model_name='account',
             name='pending_balance',
