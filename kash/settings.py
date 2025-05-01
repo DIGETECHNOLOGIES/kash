@@ -80,21 +80,21 @@ MIDDLEWARE = [
 ]
 
 
-# CORS_ALLOWED_ORIGINS = [
-#     "https://payunit.net",
-#     "https://gateway.payunit.net", 
-#     # "https://yourdomain.com",
-# ]
-
-CORS_ALLOW_ALL_ORIGINS = True  # Allows all origins
-CORS_ALLOW_METHODS = [
-    "GET",
-    "POST",
-    "PUT",
-    "PATCH",
-    "DELETE",
-    "OPTIONS"
+CORS_ALLOWED_ORIGINS = [
+    "https://payunit.net",
+    "https://gateway.payunit.net", 
+    # "https://yourdomain.com",
 ]
+
+# CORS_ALLOW_ALL_ORIGINS = True  # Allows all origins
+# CORS_ALLOW_METHODS = [
+    # "GET",
+    # "POST",
+    # "PUT",
+    # "PATCH",
+    # "DELETE",
+    # "OPTIONS"
+# ]
 
 
 ROOT_URLCONF = 'kash.urls'
@@ -121,39 +121,39 @@ WSGI_APPLICATION = 'kash.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#         'OPTIONS': {
-#     'timeout': 30,  # Set to 30 seconds
-#         }
-#     }
-    
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME') ,
-        'USER': config('DB_USER') ,
-        'PASSWORD': config('DB_PASSWORD') ,
-        'HOST': config('DB_HOST') ,
-        'PORT': 5432 ,
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
         'OPTIONS': {
-            'sslmode': 'require',  # Set to 30 seconds
+    'timeout': 30,  # Set to 30 seconds
         }
     }
+    
 }
 
-STORAGES = {
-    "default": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-    },
-    "staticfiles": {
-        "BACKEND": "storages.backends.s3boto3.S3StaticStorage",
-    },
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': config('DB_NAME') ,
+#         'USER': config('DB_USER') ,
+#         'PASSWORD': config('DB_PASSWORD') ,
+#         'HOST': config('DB_HOST') ,
+#         'PORT': 5432 ,
+#         'OPTIONS': {
+#             'sslmode': 'require',  # Set to 30 seconds
+#         }
+#     }
+# }
+
+# STORAGES = {
+#     "default": {
+#         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+#     },
+#     "staticfiles": {
+#         "BACKEND": "storages.backends.s3boto3.S3StaticStorage",
+#     },
+# }
 
 
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY')
@@ -208,6 +208,7 @@ STATIC_URL ='static/'
 STATICFILES_STORAGE = "storages.backends.s3.S3Storage"
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
+MEDIA_URL = 'media/'
 
 
 # Default primary key field type

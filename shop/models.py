@@ -2,6 +2,11 @@ from django.db import models
 from user.models import User, Location
 from django.utils import timezone
 # Create your models here.
+
+def Id_card_directory(instance, filename):
+    return f'IDcards/{instance.owner.username}/{filename}'
+
+
 class Shop(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(null=False, max_length=200)
@@ -9,7 +14,8 @@ class Shop(models.Model):
     location = models.ForeignKey(Location, related_name="shop_location", on_delete=models.SET_NULL, null=True)
     workers = models.ManyToManyField(User, related_name="shop_workers")
     owner_image = models.ImageField(upload_to='shop_owners/', null=True)
-    IDCard = models.ImageField(upload_to='IDcards/', null=True)
+    front_IDCard = models.ImageField(upload_to=Id_card_directory, null=True)
+    back_IDCard = models.ImageField(upload_to=Id_card_directory, null=True)
     is_verified = models.BooleanField(default=False)
 
     def __str__(self):
@@ -45,6 +51,11 @@ class SubCategory(models.Model):
     
 class Image(models.Model):
     image = models.ImageField(upload_to='products/')
+    created = models.DateTimeField(auto_now_add=True)
+
+
+    class Meta:
+        ordering = ['-created']
 
 class Item(models.Model):
     name = models.CharField(max_length=200)
@@ -56,6 +67,11 @@ class Item(models.Model):
     current_price = models.PositiveIntegerField(default=0)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     sub_category = models.ForeignKey(SubCategory, on_delete=models.SET_NULL, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+
+    class Meta:
+        ordering = ['-created']
     
     
     def __str__(self):
@@ -84,13 +100,29 @@ class Order(models.Model):
 class Withdrawal(models.Model):
     shop = models.ForeignKey(Shop, related_name='withdraw', on_delete=models.CASCADE)
     amount = models.PositiveIntegerField()
+    amount_to_receive = models.PositiveIntegerField()
+    charges = models.CharField(max_length=20, default=f'0')
     number = models.CharField(max_length= 20)
     service = models.CharField(max_length=20, default="MTN")
     status = models.CharField(max_length=20, default="Pending")
+    created = models.DateTimeField(auto_now_add=True)
+    # created = models.DateTimeField(auto_now_add=True)
+
+
+    class Meta:
+        ordering = ['-created']
+
+    REQUIRED_FIELDS = []
+    # name = models.PositiveIntegerField()
 
 
     def __str__(self):
         return f'{self.shop.name}:{self.id}'
+    
+    def save(self, *args, **kwargs):
+        self.amount_to_receive = self.amount*0.94
+        self.charges = self.amount*0.06
+        super().save(*args, **kwargs)
     
 
 

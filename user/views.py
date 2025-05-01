@@ -11,7 +11,7 @@ from django.utils.encoding import  force_str
 
 from .models import User
 from .tokens import account_activation_token
-from .serializers import CreateUserSerializer, LoginSerializer, NewActivationLinkserializer, email 
+from .serializers import CreateUserSerializer, LoginSerializer, NewActivationLinkserializer, UserViewSerializer, email 
 
 
 
@@ -74,7 +74,9 @@ class Login(generics.GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
+        print(request.data)
         serializer.is_valid(raise_exception=True)
+        print(request.data)
         email = serializer.validated_data.get('email')
         password = serializer.validated_data.get('password')
 
@@ -93,3 +95,12 @@ class Login(generics.GenericAPIView):
             'refresh': str(refresh),
             'access': str(refresh.access_token)
         }, status=status.HTTP_200_OK)
+    
+class UserDetails(generics.RetrieveAPIView):
+    serializer_class = UserViewSerializer
+    
+
+    def get_object(self):
+        user = self.request.user
+        return user
+    

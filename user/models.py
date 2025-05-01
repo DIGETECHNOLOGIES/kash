@@ -13,6 +13,7 @@ class User(AbstractUser):
     image = models.ImageField(upload_to='profiles')
     number = models.DecimalField(max_digits=9,decimal_places=0, null=True)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
+    username = models.CharField(max_length=200, unique=False)
     # location = models.CharField(max_length=200, null=True)
 
 
@@ -20,5 +21,11 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ['username']
 
 
+
     def  __str__(self):
         return self.username
+
+class Gain(models.Model):
+    profit = models.PositiveIntegerField()
+    withdrawal = models.PositiveIntegerField()
+    balance = models.PositiveIntegerField()

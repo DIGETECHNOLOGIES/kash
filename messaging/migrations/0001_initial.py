@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('shop', '0011_shop_image_alter_shop_owner_image'),
+        # ('shop', '0011_shop_image_alter_shop_owner_image'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 

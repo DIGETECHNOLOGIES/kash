@@ -5,6 +5,7 @@ from django.conf import settings
 from .models import Shop, User, Location, Account, Item, Order, Image, Withdrawal
 from .validators import validate_image, validate_quantity
 from user.validators import validate_number
+from user.serializers import UserViewSerializer
 import uuid
 from .models import Refund
 
@@ -62,7 +63,7 @@ class ShopCreationSerializer(serializers.ModelSerializer):
             'name',
             'location',
             'owner_image',
-            'IDCard',
+            # 'IDCard',
         ]
 
     def create(self, data):
@@ -78,21 +79,24 @@ class ShopCreationSerializer(serializers.ModelSerializer):
                 account = Account(shop = shop)
                 account.save()
             except Exception as e:
-                raise serializers.ValidationError({'creation':'Error occured in creating shop. Please try again'})
+                raise serializers.ValidationError({'message':'Error occured in creating shop. Please try again'})
         
         return shop
     
 class ShopSerializer(serializers.ModelSerializer):
     
     location = LocationSerializer(read_only = True)
-    image = ImageSerializer()
+    # image = ImageSerializer()
+    owner = UserViewSerializer()
+    # owner = U
     class Meta:
         model = Shop
         fields = [
             'id',
             'name',
             'location',
-            'image'
+            'image',
+            'owner',
         ]
     
 
@@ -108,8 +112,8 @@ class ItemSerializer(serializers.ModelSerializer):
             'shop',
             'name',
             'images',
-            'location'
-
+            'location',
+            'description',
         ]
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -138,9 +142,9 @@ class OrderSerializer(serializers.ModelSerializer):
             item = Item.objects.get(id = data['item'].id)
             order = Order.objects.create(**data)
             order.payment_id = id
-            payment = initiate_payment(amount = order.total, id=id)
+            payment = initiate_payment(amount = (int(order.total)*1.01), id=id)
             if payment.status_code == 200:
-                payment = confirm_payment(amount=order.total, id=id, number = order.number)
+                payment = confirm_payment(amount=(int(order.total)*1.01), id=id, number = order.number)
                 if payment.status_code != 200:
                     raise serializers.ValidationError({'payment_failed':{payment.text}})
                 else:
@@ -208,7 +212,8 @@ class WithdrawalRequestSerializer(serializers.ModelSerializer):
     class Meta:
 
         model = Withdrawal
-        fields = ['id', 'number', 'amount', 'status']
+        fields = ['id', 'number', 'amount', 'status', 'created', 'amount','amount_to_receive']
+        read_only_fields = ['id', 'created', 'amount_to_receive']
 
     def create(self, validated_data):
         id = self.context.get('id')
