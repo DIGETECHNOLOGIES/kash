@@ -1,6 +1,8 @@
 from .models import Item
-from shop.models import Category, Location, Image
+from shop.models import Category, Location, Image, Shop
 from rest_framework import serializers
+
+from shop.serializers import ShopSerializer
 
 class PriceValidator:
     def __call__(self, value):
@@ -25,16 +27,21 @@ class ItemSerializer(serializers.ModelSerializer):
     location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
     category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())
     current_price = serializers.DecimalField(max_digits=10, decimal_places=0, validators=[PriceValidator()])
-    images = serializers.ListField(child=serializers.ImageField(), required=False)  # Allow image upload
+    images = ImageSerializer(many=True, required = False)  
+    shop = ShopSerializer(required = False)
 
     class Meta:
         model = Item
-        fields = ['id', 'name', 'current_price', 'description', 'location', 'category', 'images']
-        read_only_fields = ['id']  # Make 'id' read-only
+        fields = ['id', 'name', 'shop', 'current_price','previous_price', 'description', 'location', 'category', 'images']
+        read_only_fields = ['id', 'shop']  # Make 'id' read-only
 
     def create(self, validated_data):
+        request = self.context.get('request')
+        user = request.user
+        shop = Shop.objects.get(owner = user)
         images_data = validated_data.pop('images', [])
         item = Item.objects.create(**validated_data)
+        item.shop = shop
 
         for image_data in images_data:
             image = Image.objects.create(image=image_data)

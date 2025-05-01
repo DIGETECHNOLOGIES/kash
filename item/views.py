@@ -10,13 +10,13 @@ from .permissions import IsOwnerPermission
 class ItemList(ListAPIView):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
-    permission_classes = [AllowAny]  
+    permission_classes = [IsAuthenticated]  
 
 class ItemDetail(RetrieveAPIView):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
     lookup_field = 'pk'
-    permission_classes = [AllowAny]  
+    permission_classes = []  
 
 class CreateItem(CreateAPIView):
     queryset = Item.objects.all()
@@ -24,7 +24,7 @@ class CreateItem(CreateAPIView):
     permission_classes = [IsAuthenticated]  
     def perform_create(self, serializer):
         images_data = self.request.FILES.getlist('images') 
-        item = serializer.save(shop=self.request.user.shop)  
+        item = serializer.save()  
         for image_file in images_data:
             image = Image.objects.create(image=image_file)
             item.images.add(image)

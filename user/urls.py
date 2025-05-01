@@ -10,6 +10,7 @@ urlpatterns = [
     path('log/', views.Login.as_view()),
     path('activate/<uidb64>/<token>/', views.ActivateAccountView.as_view(), name='account-activate'),
     path('request-new-link/', views.RequestNewLinkView.as_view(), name='request-new-link'),
+    path('', views.UserDetails.as_view(), name = 'user-data'),
    
 
 ]

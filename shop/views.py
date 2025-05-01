@@ -11,6 +11,7 @@ from django.conf import settings
 
 #serializers
 from .serializers import ShopCreationSerializer, OrderSerializer, OrderViewSerializer, ItemViewSerializer, ShopSerializer, WithdrawalRequestSerializer
+from item.serializers import ItemSerializer
 from .models import Order, Item, Account, Shop, Withdrawal
 
 
@@ -158,13 +159,14 @@ class ConfirmDelivery(generics.RetrieveUpdateAPIView):
             )
     
 class ViewItems(generics.ListAPIView):
-    serializer_class = ItemViewSerializer
+    serializer_class = ItemSerializer
     queryset = Item.objects.all()
+    # permission_classes=[]
 
-    # def get_queryset(self):
-
-        # qs= Item.objects.filter(shop__is_verified = True)
-        # return qs
+    def get_queryset(self):
+        id = self.kwargs['id']
+        qs= Item.objects.filter(shop__id = id)
+        return qs
 
 
 class SearchItems(viewsets.ModelViewSet):
@@ -181,6 +183,15 @@ class ShopView(generics.RetrieveAPIView):
     serializer_class = ShopSerializer
     queryset = Shop.objects.all()
     lookup_field = 'id'
+
+class UserShopView(generics.RetrieveAPIView):
+    serializer_class = ShopSerializer
+
+    def get_object(self):
+        shop = Shop.objects.get(owner = self.request.user)
+        return  shop
+    # queryset = Shop.objects.all()
+    # lookup_field = 'id'
 
 class WithdrawalRequest(generics.ListCreateAPIView):
     serializer_class = WithdrawalRequestSerializer
@@ -272,5 +283,13 @@ class PaymentNotification(APIView):
             return Response({"Pending": "Payment pending. Please dial *126# and confirm payment then click the confirm Pay button bellow"}, status=200)
         
         return Response({"Not_Found": "Order Not found"}, status=404)
+    
+class ShopListingView(generics.ListAPIView):
+    serializer_class = ShopSerializer
+
+    def get_queryset(self):
+        qs = Shop.objects.filter(is_verified = True)
+        return qs
+
 
 
