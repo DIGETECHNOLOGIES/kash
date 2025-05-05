@@ -10,13 +10,15 @@ from .permissions import IsOwnerPermission
 class ItemList(ListAPIView):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
-    permission_classes = [IsAuthenticated]  
+    permission_classes = [IsAuthenticated]
+    def get_queryset(self):
+        return Item.objects.filter(shop__is_verified = True)  
 
 class ItemDetail(RetrieveAPIView):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
     lookup_field = 'pk'
-    permission_classes = []  
+    # permission_classes = []  
 
 class CreateItem(CreateAPIView):
     queryset = Item.objects.all()
