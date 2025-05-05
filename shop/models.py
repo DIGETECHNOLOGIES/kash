@@ -11,7 +11,7 @@ def Id_card_directory(instance, filename):
 class Shop(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(null=False, max_length=200)
-    image= models.ImageField(upload_to='shop/', null=True)
+    image= models.ImageField(upload_to='shop_profiles/', null=True)
     location = models.ForeignKey(Location, related_name="shop_location", on_delete=models.SET_NULL, null=True)
     workers = models.ManyToManyField(User, related_name="shop_workers")
     owner_image = models.ImageField(upload_to='shop_owners/', null=True)
@@ -90,6 +90,7 @@ class Order(models.Model):
     payment_id = models.CharField(max_length=20, default='1111111111')
     payment_status = models.CharField(default='Pending', max_length=20)
     created = models.DateTimeField(auto_now_add=True)
+    code = models.CharField(max_length=6, default='6ADT5C')
 
 
     class Meta:
