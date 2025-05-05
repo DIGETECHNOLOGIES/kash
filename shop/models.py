@@ -10,7 +10,7 @@ def Id_card_directory(instance, filename):
 class Shop(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(null=False, max_length=200)
-    image= models.ImageField(upload_to='shop/', null=True)
+    image= models.ImageField(upload_to='shop_profiles/', null=True)
     location = models.ForeignKey(Location, related_name="shop_location", on_delete=models.SET_NULL, null=True)
     workers = models.ManyToManyField(User, related_name="shop_workers")
     owner_image = models.ImageField(upload_to='shop_owners/', null=True)

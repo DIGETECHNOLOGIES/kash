@@ -43,6 +43,21 @@ class ImageSerializer(serializers.ModelSerializer):
         if obj.url and request:
             return request.build_absolute_uri(obj.url)
         return None
+    
+
+
+class ImageSerializerForOrder(serializers.ModelSerializer):
+    # url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Image  
+        fields = ['id', 'url']
+
+    # def get_url(self, obj):
+    #     request = self.context.get('request') 
+    #     if obj.url and request:
+    #         return request.build_absolute_uri(obj.url)
+    #     return None
 
 
 
@@ -50,9 +65,12 @@ class ImageSerializer(serializers.ModelSerializer):
 
 class ShopCreationSerializer(serializers.ModelSerializer):
     name = serializers.CharField(write_only = True)
-    location = serializers.PrimaryKeyRelatedField(queryset = Location.objects.all())
+    location = serializers.PrimaryKeyRelatedField(queryset = Location.objects.all(), required = False)
     owner_image = serializers.ImageField(validators =[validate_image] )
-    IDCard = serializers.ImageField(validators =[validate_image])
+    front_IDCard = serializers.ImageField(validators =[validate_image])
+    back_IDCard = serializers.ImageField(validators =[validate_image])
+    image = serializers.ImageField(validators =[validate_image])
+
 
     
 
@@ -63,7 +81,9 @@ class ShopCreationSerializer(serializers.ModelSerializer):
             'name',
             'location',
             'owner_image',
-            # 'IDCard',
+            'front_IDCard',
+            'back_IDCard',
+            'image',
         ]
 
     def create(self, data):
@@ -176,25 +196,6 @@ class OrderSerializer(serializers.ModelSerializer):
 
 # class PaymentConfirmserializer(serializers.Serializer):
 
-
-class OrderViewSerializer(serializers.ModelSerializer):
-    item = ItemSerializer(read_only = True)
-
-    class Meta:
-        model = Order
-        fields = [
-            'id',
-            'buyer',
-            'item',
-            'total',
-            'quantity',
-            'delivered'
-        ]
-
-
-
-
-
 class ItemViewSerializer(serializers.ModelSerializer):
     shop = ShopSerializer(read_only = True)
     location = LocationSerializer(read_only = True)
@@ -203,6 +204,18 @@ class ItemViewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = '__all__'
+
+class OrderViewSerializer(serializers.ModelSerializer):
+    item = ItemViewSerializer(read_only = True)
+
+    class Meta:
+        model = Order
+        fields = '__all__'
+
+
+
+
+
         
 
 

@@ -19,10 +19,20 @@ from .serializers import RefundSerializer
 
 from .payment import verify_payment
 
+import random
+import string
+
+def generate_code(length=6):
+    characters = string.ascii_uppercase + string.digits
+    return ''.join(random.choices(characters, k=length))
+
+# code = generate_code()
+# print(code)
+
 # Create your views here.
 class VerifyShop(generics.CreateAPIView):
     serializer_class = ShopCreationSerializer
-    permission_classes = []
+    # permission_classes = []
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data = request.data)
@@ -30,7 +40,7 @@ class VerifyShop(generics.CreateAPIView):
         serializer.save()
 
         return Response({
-            'success':'Shop Creation request submitted successfully, Our team is viewing your request and you will get a response in the next 5 business days. ',
+            'success':'Shop Creation request submitted successfully, Our team is viewing your request and you will get a response in at most 5 business days. ',
            
         },  status=status.HTTP_201_CREATED)
     
@@ -43,7 +53,7 @@ class PlaceOrder(generics.CreateAPIView):
         serializer.is_valid(raise_exception = True)
         serializer.save()
         return Response({
-            'success':'Order placed successfully. Dial *126# and confirm payment then click the Confirm Pay button below'
+            'success':'Order placed successfully. To confirm order Dial *126# and confirm payment from your MoMo. Additional charges may apply.'
         },  status=status.HTTP_201_CREATED)
 
 
@@ -60,6 +70,8 @@ class PaymentConfirmation(APIView):
             message = data.get('message')
             order = Order.objects.get(payment_id = transaction_id)
             order.payment_status = status
+            order.code = generate_code()
+
             order.save()
             print('order is ',order.item.shop.owner.email)
             
@@ -88,29 +100,15 @@ class PaymentConfirmation(APIView):
                 return Response({"Pending": "Payment pending. Please dial *126# and confirm payment then click the confirm Pay button bellow"}, status=200)
            
             return Response({"Not_Found": "Order Not found"}, status=404)
-                    
-                    
-
-                # except Exception as e:
-                #     # raise serializers.ValidationError({'Order':'Error placing order. Please try again'})
-                #     return Response(
-                #         {'error':f'Error sending mail: {e}'}
-                #     )
-        # except Exception as e:
-        #     return Response({
-        #         'error':f'Internal server error'
-        #     })
-
-
-
 
 class BuyOrderView(generics.ListAPIView):
     serializer_class = OrderViewSerializer
     queryset = Order.objects.all()
+    # permission_classes = []
 
     def get_queryset(self):
         user = self.request.user
-        qs = Order.objects.filter(buyer = user)
+        qs = Order.objects.filter(buyer = user, payment_status = 'SUCCESS' )
         return qs
     
 
@@ -139,8 +137,10 @@ class ConfirmDelivery(generics.RetrieveUpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         order = self.get_object()
+        print(request.data)
+        code = request.data['code']
         
-        if order:
+        if order.code == code:
             order.delivered = True
             order.save()
             account = Account.objects.get(shop = order.item.shop)
@@ -151,13 +151,13 @@ class ConfirmDelivery(generics.RetrieveUpdateAPIView):
             return Response(
                 {
                     'success':'Item delivered successfully',
-                }
+                }, status=status.HTTP_200_OK
             )
         return Response(
                 {
-                    'failed':'Order not found',
+                    'failed':'Incorrect Delivery Code',
                     
-                }
+                }, status=status.HTTP_400_BAD_REQUEST
             )
     
 class ViewItems(generics.ListAPIView):

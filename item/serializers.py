@@ -24,8 +24,8 @@ class ImageSerializer(serializers.ModelSerializer):
         return None
 
 class ItemSerializer(serializers.ModelSerializer):
-    location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
-    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())
+    location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all() , required = False)
+    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), required = False)
     current_price = serializers.DecimalField(max_digits=10, decimal_places=0, validators=[PriceValidator()])
     images = ImageSerializer(many=True, required = False)  
     shop = ShopSerializer(required = False)
