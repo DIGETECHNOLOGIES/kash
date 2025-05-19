@@ -1,6 +1,6 @@
 from django.db import models
 from user.models import User, Location
-
+from django.utils import timezone
 # Create your models here.
 class Shop(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -11,7 +11,6 @@ class Shop(models.Model):
     owner_image = models.ImageField(upload_to='shop_owners/', null=True)
     IDCard = models.ImageField(upload_to='IDcards/', null=True)
     is_verified = models.BooleanField(default=False)
-
 
     def __str__(self):
         return self.name
@@ -72,7 +71,7 @@ class Order(models.Model):
     number = models.CharField(default="0", max_length=9)
     payment_id = models.CharField(max_length=20, default='1111111111')
     payment_status = models.CharField(default='Pending', max_length=20)
-
+    is_paid=models.BooleanField(default=False)#added this for the refund functionality
 
     def __str__(self):
         return self.item.name
@@ -97,3 +96,23 @@ class Withdrawal(models.Model):
 
 # class Refund(models.Model):
     # order = models.
+class Refund(models.Model):
+    PAYMENT_CHOICES=[('mtnmomo','MTN Mobile Money'),]#Just in case we add Orange money
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    order=models.ForeignKey(Order,on_delete=models.CASCADE)
+    reason=models.TextField()
+    refund_amount=models.DecimalField(max_digits=12,decimal_places=0)
+    payment_method=models.CharField(max_length=255,choices=PAYMENT_CHOICES)
+    evidense=models.FileField(upload_to='refund/evidense/',blank=False,null=False)
+    status=models.CharField(max_length=255,choices=STATUS_CHOICES,default='pending')
+    submited_at=models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"Refund for {self.user.username} for Order {self.order.id}"
+    class Meta:
+        unique_together = ('user', 'order')  #i added this to prevent duplicate refunds

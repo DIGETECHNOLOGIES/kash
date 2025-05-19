@@ -8,11 +8,13 @@ from rest_framework.permissions import AllowAny
 from django.db import transaction
 from django.core.mail import send_mail
 from django.conf import settings
+from .models import Refund
 
+from rest_framework.permissions import IsAuthenticated 
 #serializers
 from .serializers import ShopCreationSerializer, OrderSerializer, OrderViewSerializer, ItemViewSerializer, ShopSerializer, WithdrawalRequestSerializer
 from .models import Order, Item, Account, Shop, Withdrawal
-
+from .serializers import RefundSerializer
 
 from .payment import verify_payment
 
@@ -273,4 +275,20 @@ class PaymentNotification(APIView):
         
         return Response({"Not_Found": "Order Not found"}, status=404)
 
+
+#Refund Functionality
+
+class RefundCreateAPIView(generics.CreateAPIView):
+    serializer_class = RefundSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Refund.objects.filter(user=self.request.user)
+#For users to see their refund requests   
+class RefundListAPIView(generics.ListAPIView):
+    serializer_class = RefundSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Refund.objects.filter(user=self.request.user)
 
