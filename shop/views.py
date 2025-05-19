@@ -108,7 +108,7 @@ class BuyOrderView(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        qs = Order.objects.filter(buyer = user, payment_status = 'SUCCESS' )
+        qs = Order.objects.filter(buyer = user, payment_status = 'SUCCESSFUL' )
         return qs
     
 
