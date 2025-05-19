@@ -255,7 +255,7 @@ class WithdrawalRequestSerializer(serializers.ModelSerializer):
 class RefundSerializer(serializers.ModelSerializer):
     class Meta:
         model = Refund
-        fields = ['id', 'order', 'reason', 'refund_amount', 'payment_method', 'evidense', 'status', 'submitted_at']
+        fields = ['id', 'order', 'reason', 'refund_amount', 'payment_method''account_number','account_name', 'evidense', 'status', 'submitted_at']
         read_only_fields = ['status', 'submitted_at']
 
     def validate_order(self, value):

@@ -140,6 +140,8 @@ class Refund(models.Model):
     reason=models.TextField()
     refund_amount=models.DecimalField(max_digits=12,decimal_places=0)
     payment_method=models.CharField(max_length=255,choices=PAYMENT_CHOICES)
+    account_number=models.CharField(max_length=9)
+    account_name=models.CharField(max_length=255)
     evidense=models.FileField(upload_to='refund/evidense/',blank=False,null=False)
     status=models.CharField(max_length=255,choices=STATUS_CHOICES,default='pending')
     submited_at=models.DateTimeField(default=timezone.now)
