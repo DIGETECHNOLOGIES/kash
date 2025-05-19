@@ -11,7 +11,7 @@ from django.utils.encoding import  force_str
 
 from .models import User
 from .tokens import account_activation_token
-from .serializers import CreateUserSerializer, LoginSerializer, NewActivationLinkserializer, UserViewSerializer, email 
+from .serializers import CreateUserSerializer, LoginSerializer, NewActivationLinkserializer, UserViewSerializer, email as emailSend
 
 
 
@@ -22,7 +22,7 @@ class RequestNewLinkView(generics.GenericAPIView):
 
     @staticmethod
     def send_activation_email(user_email, username, user, request):
-        email(user_email, username, user, request)
+        emailSend(user_email, username, user, request)
 
     def post(self, request):
         email = request.data.get('email')
@@ -87,6 +87,8 @@ class Login(generics.GenericAPIView):
 
         if user is None:
             if User.objects.filter(email=email, is_active=False).exists():
+                user = User.objects.get(email = email)
+                emailSend(user.email, user.username, user, request)
                 raise AuthenticationFailed('Account has not yet been activated.')
             raise AuthenticationFailed('Email and password do not match.')
 

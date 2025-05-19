@@ -121,39 +121,39 @@ WSGI_APPLICATION = 'kash.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-        'OPTIONS': {
-    'timeout': 30,  # Set to 30 seconds
-        }
-    }
-    
-}
-
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': config('DB_NAME') ,
-#         'USER': config('DB_USER') ,
-#         'PASSWORD': config('DB_PASSWORD') ,
-#         'HOST': config('DB_HOST') ,
-#         'PORT': 5432 ,
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
 #         'OPTIONS': {
-#             'sslmode': 'require',  # Set to 30 seconds
+#     'timeout': 30,  # Set to 30 seconds
 #         }
 #     }
+    
 # }
 
-# STORAGES = {
-#     "default": {
-#         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-#     },
-#     "staticfiles": {
-#         "BACKEND": "storages.backends.s3boto3.S3StaticStorage",
-#     },
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME') ,
+        'USER': config('DB_USER') ,
+        'PASSWORD': config('DB_PASSWORD') ,
+        'HOST': config('DB_HOST') ,
+        'PORT': 5432 ,
+        'OPTIONS': {
+            'sslmode': 'require',  # Set to 30 seconds
+        }
+    }
+}
+
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "storages.backends.s3boto3.S3StaticStorage",
+    },
+}
 
 
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY')
@@ -201,8 +201,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 
-# STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
-# MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
 STATIC_URL ='static/'
 
 STATICFILES_STORAGE = "storages.backends.s3.S3Storage"
