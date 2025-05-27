@@ -7,7 +7,7 @@ from .validators import validate_image, validate_quantity
 from user.validators import validate_number
 from user.serializers import UserViewSerializer
 import uuid
-
+from .models import Refund
 
 #payment
 from .payment import initiate_payment, confirm_payment
@@ -252,6 +252,27 @@ class WithdrawalRequestSerializer(serializers.ModelSerializer):
         else:
             raise serializers.ValidationError({'amount':'Amount is more than available balance'})
 
+class RefundSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Refund
+        fields = ['id', 'order', 'reason', 'refund_amount', 'payment_method''account_number','account_name', 'evidense', 'status', 'submitted_at']
+        read_only_fields = ['status', 'submitted_at']
+
+    def validate_order(self, value):
+        request = self.context['request']
+        user = request.user
+        # to ensure the order belongs to the user and is paid
+        if value.user != user:
+            raise serializers.ValidationError("This order does not belong to you.")
+        if not value.is_paid:
+            raise serializers.ValidationError("Cannot request a refund for an unpaid order.")
+        if Refund.objects.filter(user=user, order=value).exists():
+            raise serializers.ValidationError("Refund request already submitted for this order.")
+        return value
+
+    def create(self, validated_data):
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)
 
 
 

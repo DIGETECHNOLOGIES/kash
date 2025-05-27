@@ -1,7 +1,7 @@
 from django.db import models
 from user.models import User, Location
 import math
-
+from django.utils import timezone
 # Create your models here.
 
 def Id_card_directory(instance, filename):
@@ -18,7 +18,6 @@ class Shop(models.Model):
     front_IDCard = models.ImageField(upload_to=Id_card_directory, null=True)
     back_IDCard = models.ImageField(upload_to=Id_card_directory, null=True)
     is_verified = models.BooleanField(default=False)
-
 
     def __str__(self):
         return self.name
@@ -91,10 +90,11 @@ class Order(models.Model):
     payment_status = models.CharField(default='Pending', max_length=20)
     created = models.DateTimeField(auto_now_add=True)
     code = models.CharField(max_length=6, default='6ADT5C')
-
+    is_paid=models.BooleanField(default=False)#added this for the refund functionality
 
     class Meta:
         ordering = ['-created']
+    
 
 
     def __str__(self):
@@ -134,25 +134,51 @@ class Withdrawal(models.Model):
     
 
 
+# <<<<<<< HEAD
+# class Refund(models.Model):
+#     order = models.ForeignKey(Order, on_delete=models.CASCADE)
+#     choices = [
+#         ('Pending', 'PENDING'),
+#         ('Rejected', 'REJECTED'),
+#         ('Paid', 'PAID')
+#     ]
+#     status = models.CharField(max_length=20, choices=choices)
+#     reason = models.TextField()
+#     created = models.DateTimeField(auto_now_add=True)
+#     amount = models.PositiveIntegerField(default=1)
+
+
+#     class Meta:
+#         ordering = ['-created']
+
+#     def save(self, *args, **kwargs):
+#         self.amount = math.floor(self.order.total * 0.96)
+#         super().save(*args, **kwargs)
+
+#     def __str__(self):
+#         return f'{self.order.buyer.username}: {self.order.item.name} - {self.order.total * 0.95}'
+
+# class Refund(models.Model):
+    # order = models.
 class Refund(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    choices = [
-        ('Pending', 'PENDING'),
-        ('Rejected', 'REJECTED'),
-        ('Paid', 'PAID')
+    PAYMENT_CHOICES=[('mtnmomo','MTN Mobile Money'),]#Just in case we add Orange money
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
     ]
-    status = models.CharField(max_length=20, choices=choices)
-    reason = models.TextField()
-    created = models.DateTimeField(auto_now_add=True)
-    amount = models.PositiveIntegerField(default=1)
-
-
-    class Meta:
-        ordering = ['-created']
-
-    def save(self, *args, **kwargs):
-        self.amount = math.floor(self.order.total * 0.96)
-        super().save(*args, **kwargs)
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    order=models.ForeignKey(Order,on_delete=models.CASCADE)
+    reason=models.TextField()
+    refund_amount=models.DecimalField(max_digits=12,decimal_places=0)
+    payment_method=models.CharField(max_length=255,choices=PAYMENT_CHOICES)
+    account_number=models.CharField(max_length=9)
+    account_name=models.CharField(max_length=255)
+    evidense=models.FileField(upload_to='refund/evidense/',blank=False,null=False)
+    status=models.CharField(max_length=255,choices=STATUS_CHOICES,default='pending')
+    submited_at=models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f'{self.order.buyer.username}: {self.order.item.name} - {self.order.total * 0.95}'
+        return f"Refund for {self.user.username} for Order {self.order.id}"
+    class Meta:
+        unique_together = ('user', 'order')  #i added this to prevent duplicate refunds
