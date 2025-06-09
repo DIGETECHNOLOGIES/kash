@@ -311,3 +311,80 @@ class RefundListAPIView(generics.ListAPIView):
     def get_queryset(self):
         return Refund.objects.filter(user=self.request.user)
 
+#Resale View
+
+class ResaleItemView(APIView): 
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, item_id):
+        try:
+            original_item = Item.objects.get(id=item_id)
+        except Item.DoesNotExist:
+            return Response({"error": "Original item not found."}, status=404)
+        
+        # Prevent reselling your own item
+        if original_item.shop == request.user.shop:  
+            return Response({"error": "You cannot resell your own item."}, status=400)
+
+        data = request.data.copy()
+        data['is_resale'] = True
+        data['original_item'] = original_item.id
+        data['shop'] = request.user.id  
+
+        serializer = ItemSerializer(data=data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+    
+    #Handleing the Amont (Sharing Profit and Linking price to original shop)
+class PurchaseItemView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, item_id):
+        try:
+            item = Item.objects.get(id=item_id)
+        except Item.DoesNotExist:
+            return Response({"error": "Item not found."}, status=404)
+
+        # Get original item and original shop
+        if item.is_resale and item.original_item:
+            original_item = item.original_item
+            original_shop = original_item.shop
+            reseller = item.shop
+            original_price = original_item.price
+            amount_paid = item.price
+            profit = amount_paid - original_price
+            delivered_by = original_shop
+        else:
+            original_item = None
+            original_shop = item.shop
+            reseller = None
+            original_price = item.price
+            amount_paid = item.price
+            profit = 0
+            delivered_by = original_shop
+
+        # You could add payment and validation logic here...
+
+        # Save purchase info
+        Item.objects.create(
+            item=item,
+            buyer=request.user,
+            original_shop=original_shop,
+            reseller=reseller,
+            original_price=original_price,
+            amount_paid=amount_paid,
+            profit=profit,
+            delivered_by=delivered_by,
+        )
+
+        return Response({
+            "message": "Purchase successful.",
+            "original_shop": original_shop.user.username,
+            "reseller": reseller.user.username if reseller else None,
+            "original_price": original_price,
+            "amount_paid": amount_paid,
+            "profit_to_reseller": profit,
+            "delivery_by": delivered_by.user.username
+        }, status=201)

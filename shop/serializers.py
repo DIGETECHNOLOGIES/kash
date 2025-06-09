@@ -135,6 +135,14 @@ class ItemSerializer(serializers.ModelSerializer):
             'location',
             'description',
         ]
+    #Extract Incoming photos and change or maintain for Resale Fnctionality
+    def create(self, validated_data):
+        photos_data = validated_data.pop('photos', [])
+        Item = Item.objects.create(**validated_data)
+        for photo_data in photos_data:
+            photo = Image.objects.create(**photo_data)
+            Item.photos.add(photo)
+        return Item
 
 class OrderSerializer(serializers.ModelSerializer):
     
@@ -255,7 +263,7 @@ class WithdrawalRequestSerializer(serializers.ModelSerializer):
 class RefundSerializer(serializers.ModelSerializer):
     class Meta:
         model = Refund
-        fields = ['id', 'order', 'reason', 'refund_amount', 'payment_method''account_number','account_name', 'evidense', 'status', 'submitted_at']
+        fields = ['id', 'order', 'reason', 'refund_amount', 'payment_method', 'evidense', 'status', 'submitted_at']
         read_only_fields = ['status', 'submitted_at']
 
     def validate_order(self, value):

@@ -17,7 +17,11 @@ urlpatterns = [
     path('transaction_status/<str:id>/', views.PaymentConfirmation.as_view()),
     path('withdraw/<str:id>/', views.WithdrawalRequest.as_view()),
     path('transaction/callback/', views.PaymentNotification.as_view()),
+    path('shops/', views.ShopListingView.as_view(), name = 'shop-listing'),
     path('refund/', views.RefundCreateAPIView.as_view(), name='refund_'),
     path('my-refunds/', views.RefundListAPIView.as_view(), name='my_refunds'),
+    #Resale
+    path('resale/<int:product_id>/', views.ResaleProductView.as_view(), name='resale-product'),
+
 
 ]
