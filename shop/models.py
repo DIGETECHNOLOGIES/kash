@@ -90,7 +90,7 @@ class Order(models.Model):
     payment_status = models.CharField(default='Pending', max_length=20)
     created = models.DateTimeField(auto_now_add=True)
     code = models.CharField(max_length=6, default='6ADT5C')
-    is_paid=models.BooleanField(default=False)#added this for the refund functionality
+    # is_paid=models.BooleanField(default=False)#added this for the refund functionality
 
     class Meta:
         ordering = ['-created']
@@ -161,20 +161,22 @@ class Withdrawal(models.Model):
 # class Refund(models.Model):
     # order = models.
 class Refund(models.Model):
-    PAYMENT_CHOICES=[('mtnmomo','MTN Mobile Money'),]#Just in case we add Orange money
+    PAYMENT_CHOICES=[
+        ('mtnmomo','MTN Mobile Money'),
+        ('orangemomo', 'Orange Mobile Money')]#Just in case we add Orange money
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
     ]
-    user=models.ForeignKey(User,on_delete=models.CASCADE)
-    order=models.ForeignKey(Order,on_delete=models.CASCADE)
+    user=models.ForeignKey(User,on_delete=models.CASCADE, null = True)
+    order=models.ForeignKey(Order,on_delete=models.CASCADE, null = True)
     reason=models.TextField()
-    refund_amount=models.DecimalField(max_digits=12,decimal_places=0)
-    payment_method=models.CharField(max_length=255,choices=PAYMENT_CHOICES)
-    account_number=models.CharField(max_length=9)
-    account_name=models.CharField(max_length=255)
-    evidense=models.FileField(upload_to='refund/evidense/',blank=False,null=False)
+    refund_amount=models.DecimalField(max_digits=12,decimal_places=0, default = 0)
+    payment_method=models.CharField(max_length=255,choices=PAYMENT_CHOICES, default = 'MTN')
+    account_number=models.CharField(max_length=9, default = '677482442')
+    account_name=models.CharField(max_length=255, default='Frank Neba')
+    evidense=models.FileField(upload_to='refund/evidense/',blank=False,null=False, default = 'hello.pdf')
     status=models.CharField(max_length=255,choices=STATUS_CHOICES,default='pending')
     submited_at=models.DateTimeField(default=timezone.now)
 

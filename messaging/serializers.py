@@ -6,16 +6,45 @@ from shop.serializers import ShopSerializer
 
 class UserSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
     class Meta:
         model =User
         fields = [
             'id',
             'name',
             'email',
+            'image'
         ]
     
     def get_name(self, obj):
         return obj.username
+    
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image:
+            return request.build_absolute_uri(obj.image.url)
+        return None
+
+class ShopSerializer(serializers.ModelSerializer):
+    
+    # location = LocationSerializer(read_only = True)
+    image = serializers.SerializerMethodField()
+    # owner = UserViewSerializer()
+    # owner = U
+    class Meta:
+        model = Shop
+        fields = [
+            'id',
+            'name',
+            # 'location',
+            'image',
+            # 'owner',
+        ]
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image:
+            return request.build_absolute_uri(obj.image.url)
+        return None
 
 
 
@@ -36,15 +65,18 @@ class MessageSerializer(serializers.ModelSerializer):
             'sender_type',
         ]
 
-    def get_sender(self,obj):
+    def get_sender(self, obj):
+        request = self.context.get('request')
         if obj.sender_type == 'user':
-            return UserSerializer(obj.sender_user).data
-        return ShopSerializer(obj.sender_shop).data
-    
-    def get_receiver(self,obj):
+            return UserSerializer(obj.sender_user, context={'request': request}).data
+        return ShopSerializer(obj.sender_shop, context={'request': request}).data
+
+    def get_receiver(self, obj):
+        request = self.context.get('request')
         if obj.sender_type == 'user':
-            return ShopSerializer(obj.receiver_shop).data
-        return UserSerializer(obj.receiver_user).data
+            return ShopSerializer(obj.receiver_shop, context={'request': request}).data
+        return UserSerializer(obj.receiver_user, context={'request': request}).data
+
     
     def validate(self, data):
         view = self.context.get('view')
