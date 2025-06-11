@@ -20,4 +20,5 @@ urlpatterns = [
     path('shops/', views.ShopListingView.as_view(), name = 'shop-listing'),
     path('refund/', views.RefundCreateAPIView.as_view(), name='refund_'),
     path('my-refunds/', views.RefundListAPIView.as_view(), name='my_refunds'),
+    path('account/',views.ShopAccountView.as_view(), name = 'account-view'),
 ]

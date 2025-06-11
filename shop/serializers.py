@@ -225,12 +225,15 @@ class WithdrawalRequestSerializer(serializers.ModelSerializer):
     class Meta:
 
         model = Withdrawal
-        fields = ['id', 'number', 'amount', 'status', 'created', 'amount','amount_to_receive']
-        read_only_fields = ['id', 'created', 'amount_to_receive']
+        fields = ['id', 'number', 'amount', 'status', 'created','amount_to_receive', 'name']
+        read_only_fields = ['id', 'created', 'amount_to_receive','status', 'name']
 
     def create(self, validated_data):
         id = self.context.get('id')
+        request =  self.context.get('request')
         shop = Shop.objects.get(id = id)
+        if request.user.id != shop.owner.id:
+            serializers.ValidationError('Cannot place withdrawal for this shop')
         validated_data['shop'] = shop
         validated_data['status'] = 'Pending'
         account = Account.objects.get(shop__id = id)
@@ -248,9 +251,9 @@ class WithdrawalRequestSerializer(serializers.ModelSerializer):
             )
             return withdrawal
         elif int(amount) < 1000:
-            raise serializers.ValidationError({'amount':'Amount is less than minimum withdrawal of 1000frs'})
+            raise serializers.ValidationError({'message':'Amount is less than minimum withdrawal of 1000frs'})
         else:
-            raise serializers.ValidationError({'amount':'Amount is more than available balance'})
+            raise serializers.ValidationError({'message':'Amount is more than available balance'})
 
 class RefundSerializer(serializers.ModelSerializer):
     class Meta:
@@ -273,6 +276,12 @@ class RefundSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
+    
+
+class AccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Account
+        fields = '__all__'
 
 
 

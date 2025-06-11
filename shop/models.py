@@ -114,6 +114,7 @@ class Withdrawal(models.Model):
     service = models.CharField(max_length=20, default="MTN")
     status = models.CharField(max_length=20, default="Pending")
     created = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=200, default='neba')
     # created = models.DateTimeField(auto_now_add=True)
 
 

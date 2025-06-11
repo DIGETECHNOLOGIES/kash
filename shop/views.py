@@ -12,7 +12,7 @@ from .models import Refund
 
 from rest_framework.permissions import IsAuthenticated 
 #serializers
-from .serializers import ShopCreationSerializer, OrderSerializer, OrderViewSerializer, ItemViewSerializer, ShopSerializer, WithdrawalRequestSerializer
+from .serializers import ShopCreationSerializer, OrderSerializer, OrderViewSerializer, ItemViewSerializer, ShopSerializer, WithdrawalRequestSerializer, AccountSerializer
 from item.serializers import ItemSerializer
 from .models import Order, Item, Account, Shop, Withdrawal
 from .serializers import RefundSerializer
@@ -231,6 +231,8 @@ class WithdrawalRequest(generics.ListCreateAPIView):
 #             'success':'Order placed successfully. Dial *126# and confirm payment then click the Confirm Pay button below'
 #         },  status=status.HTTP_201_CREATED)
 
+
+# Receive notification for successful payment
 class PaymentNotification(APIView):
     authentication_classes = []
     permission_classes = []
@@ -310,4 +312,17 @@ class RefundListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         return Refund.objects.filter(user=self.request.user)
+    
+
+
+#Shop money
+class ShopAccountView(generics.RetrieveAPIView):
+    serializer_class = AccountSerializer
+    
+
+    def get_object(self):
+        user = self.request.user
+        shop = Shop.objects.get(owner__id = user.id)
+        account = Account.objects.get(shop = shop)
+        return account
 
