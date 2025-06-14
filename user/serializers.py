@@ -69,7 +69,7 @@ class UserViewSerializer(serializers.ModelSerializer):
     # location = LocationSerializer()
     class Meta:
         model = User
-        fields = ['id', 'email', 'image', 'number', 'location', 'username']
+        fields = ['id', 'email', 'image', 'number', 'location', 'username','date_joined']
 
 
 

@@ -29,19 +29,33 @@ class ItemSerializer(serializers.ModelSerializer):
     current_price = serializers.DecimalField(max_digits=10, decimal_places=0, validators=[PriceValidator()])
     images = ImageSerializer(many=True, required = False)  
     shop = ShopSerializer(required = False)
+    original_item = serializers.SerializerMethodField()
 
     class Meta:
         model = Item
-        fields = ['id', 'name', 'shop', 'current_price','previous_price', 'description', 'location', 'category', 'images']
-        read_only_fields = ['id', 'shop']  # Make 'id' read-only
+        fields = ['id', 'name', 'shop', 'current_price','previous_price', 'description', 'location', 'category', 'images', 'is_resale', 'original_item', 'secret_code', 'is_custom','delivery']
+        read_only_fields = ['id', 'shop','secret_code']  # Make 'id' read-only
 
     def create(self, validated_data):
         request = self.context.get('request')
         user = request.user
+        id = self.context.get('id')
+        original_item = Item.objects.get(id=id) if id else None
+        if original_item:
+            validated_data['original_item'] = original_item
+            if validated_data['current_price'] <= original_item.current_price:
+                raise serializers.ValidationError({"error":"Current price must be greater than the original item's current price."})
         shop = Shop.objects.get(owner = user)
         images_data = validated_data.pop('images', [])
         item = Item.objects.create(**validated_data)
         item.shop = shop
+        import random
+
+        code = str(random.randint(100000, 999999))
+        print(code)
+        item.secret_code = str(item.id) + code
+
+
 
         for image_data in images_data:
             image = Image.objects.create(image=image_data)
@@ -67,5 +81,17 @@ class ItemSerializer(serializers.ModelSerializer):
                 instance.images.add(image)
 
         return instance
+    
+    def get_original_item(self, obj):
+        if obj.original_item:
+            print(obj.original_item)
+            return ItemSerializer(obj.original_item, context=self.context).data
+        return None
+    
+    
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'
 
 

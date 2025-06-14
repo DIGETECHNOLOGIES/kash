@@ -2,6 +2,8 @@ from django.db import models
 from user.models import User, Location
 import math
 from django.utils import timezone
+import math
+
 # Create your models here.
 
 def Id_card_directory(instance, filename):
@@ -32,13 +34,10 @@ class Account(models.Model):
         return self.shop.name
 
 class Category(models.Model):
-    CATEGORY_CHOICE=[('electronics', 'Electronics'),
-        ('fashion', 'Fashion'),
-        ('home', 'Home & Kitchen'),
-        ('books', 'Books'),
-        ('other', 'Other'),]
+    
 
-    name = models.CharField(max_length=255,choices=CATEGORY_CHOICE,default='other')
+    name = models.CharField(max_length=255,default='other')
+    image = models.ImageField(upload_to='categories/', null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -69,6 +68,17 @@ class Item(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     sub_category = models.ForeignKey(SubCategory, on_delete=models.SET_NULL, null=True)
     created = models.DateTimeField(auto_now_add=True)
+    count = models.PositiveBigIntegerField(null = False, default= 0)
+    total_sold = models.PositiveBigIntegerField(null=False, default=0)
+    #Implimenting Resale
+    is_resale = models.BooleanField(default=False)
+    original_item = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='resales')
+    delivery = models.TextField(null = True)
+
+    #for bargain
+    is_custom = models.BooleanField(default=False)
+    secret_code = models.CharField(max_length=100, null=True, blank=True, unique=True)
+    
 
 
     class Meta:
@@ -88,13 +98,21 @@ class Order(models.Model):
     number = models.CharField(default="0", max_length=9)
     payment_id = models.CharField(max_length=20, default='1111111111')
     payment_status = models.CharField(default='Pending', max_length=20)
-    created = models.DateTimeField(auto_now_add=True)
-    code = models.CharField(max_length=6, default='6ADT5C')
+
     # is_paid=models.BooleanField(default=False)#added this for the refund functionality
+    created = models.DateTimeField(auto_now_add=True)
+    code = models.CharField(max_length=10, default='6ADT5C')
+    #Resale
+    original_shop = models.ForeignKey(Shop, on_delete=models.CASCADE, related_name='original_sales', default=1)
+    reseller = models.ForeignKey(Shop, on_delete=models.CASCADE, null=True, blank=True, related_name='resales')
+    amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    original_price = models.DecimalField(max_digits=10, decimal_places=2, default = 0)
+    profit = models.DecimalField(max_digits=10, decimal_places=2, default=1)
+    delivered_by = models.ForeignKey(Shop, on_delete=models.CASCADE, related_name='deliveries', default = 1)
+    
 
     class Meta:
         ordering = ['-created']
-    
 
 
     def __str__(self):
@@ -114,6 +132,7 @@ class Withdrawal(models.Model):
     service = models.CharField(max_length=20, default="MTN")
     status = models.CharField(max_length=20, default="Pending")
     created = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=200, default='neba')
     # created = models.DateTimeField(auto_now_add=True)
 
 
@@ -134,7 +153,7 @@ class Withdrawal(models.Model):
     
 
 
-# <<<<<<< HEAD
+
 # class Refund(models.Model):
 #     order = models.ForeignKey(Order, on_delete=models.CASCADE)
 #     choices = [
@@ -158,6 +177,7 @@ class Withdrawal(models.Model):
 #     def __str__(self):
 #         return f'{self.order.buyer.username}: {self.order.item.name} - {self.order.total * 0.95}'
 
+
 # class Refund(models.Model):
     # order = models.
 class Refund(models.Model):
@@ -171,6 +191,7 @@ class Refund(models.Model):
     ]
     user=models.ForeignKey(User,on_delete=models.CASCADE, null = True)
     order=models.ForeignKey(Order,on_delete=models.CASCADE, null = True)
+    account_name = models.CharField(max_length=9, null=False)
     reason=models.TextField()
     refund_amount=models.DecimalField(max_digits=12,decimal_places=0, default = 0)
     payment_method=models.CharField(max_length=255,choices=PAYMENT_CHOICES, default = 'MTN')

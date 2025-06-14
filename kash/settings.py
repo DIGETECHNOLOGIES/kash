@@ -122,41 +122,41 @@ WSGI_APPLICATION = 'kash.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 #development
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-        'OPTIONS': {
-    'timeout': 30,  # Set to 30 seconds
-        }
-    }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#         'OPTIONS': {
+#     'timeout': 30,  # Set to 30 seconds
+#         }
+#     }
     
-}
+# }
 
 #production
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': config('DB_NAME') ,
-#         'USER': config('DB_USER') ,
-#         'PASSWORD': config('DB_PASSWORD') ,
-#         'HOST': config('DB_HOST') ,
-#         'PORT': 5432 ,
-#         'OPTIONS': {
-#             'sslmode': 'require',  # Set to 30 seconds
-#         }
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME') ,
+        'USER': config('DB_USER') ,
+        'PASSWORD': config('DB_PASSWORD') ,
+        'HOST': config('DB_HOST') ,
+        'PORT': 5432 ,
+        'OPTIONS': {
+            'sslmode': 'require',  # Set to 30 seconds
+        }
+    }
+}
 
-# STORAGES = {
-#     "default": {
-#         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-#     },
-#     "staticfiles": {
-#         "BACKEND": "storages.backends.s3boto3.S3StaticStorage",
-#     },
-# }
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "storages.backends.s3boto3.S3StaticStorage",
+    },
+}
 
 
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY')
@@ -165,7 +165,7 @@ AWS_STORAGE_BUCKET_NAME = config('AWS_S3_BUCKET_NAME')
 AWS_S3_REGION_NAME = "eu-north-1" 
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com'
 
-# DEFAULT_FILE_STORAGE = "storages.backends.s3.S3Storage"
+DEFAULT_FILE_STORAGE = "storages.backends.s3.S3Storage"
 
 
 
