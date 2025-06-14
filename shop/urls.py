@@ -22,6 +22,6 @@ urlpatterns = [
     path('my-refunds/', views.RefundListAPIView.as_view(), name='my_refunds'),
     path('account/',views.ShopAccountView.as_view(), name = 'account-view'),
     #Resale
-    path('resale/<int:product_id>/', views.ResaleProductView.as_view(), name='resale-product'),
+    path('resale/<int:item_id>/', views.ResaleItemView.as_view(), name='resale-product'),
 
 ]

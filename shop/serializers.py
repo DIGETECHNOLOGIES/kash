@@ -134,6 +134,7 @@ class ItemSerializer(serializers.ModelSerializer):
             'images',
             'location',
             'description',
+            'delivery'
         ]
     #Extract Incoming photos and change or maintain for Resale Fnctionality
     def create(self, validated_data):
@@ -170,6 +171,9 @@ class OrderSerializer(serializers.ModelSerializer):
             item = Item.objects.get(id = data['item'].id)
             order = Order.objects.create(**data)
             order.payment_id = id
+            import random
+            code = str(random.randint(100000, 999999))
+            order.code = str(order.id) + code
             payment = initiate_payment(amount = (int(order.total)*1.01), id=id)
             if payment.status_code == 200:
                 payment = confirm_payment(amount=(int(order.total)*1.01), id=id, number = order.number)
@@ -241,7 +245,7 @@ class WithdrawalRequestSerializer(serializers.ModelSerializer):
         request =  self.context.get('request')
         shop = Shop.objects.get(id = id)
         if request.user.id != shop.owner.id:
-            serializers.ValidationError('Cannot place withdrawal for this shop')
+            serializers.ValidationError({'error':'Cannot place withdrawal for this shop'})
         validated_data['shop'] = shop
         validated_data['status'] = 'Pending'
         account = Account.objects.get(shop__id = id)
@@ -266,22 +270,25 @@ class WithdrawalRequestSerializer(serializers.ModelSerializer):
 class RefundSerializer(serializers.ModelSerializer):
     class Meta:
         model = Refund
-        fields = ['id', 'order', 'reason', 'refund_amount', 'payment_method', 'evidense', 'status', 'submitted_at']
-        read_only_fields = ['status', 'submitted_at']
+        fields = ['id', 'order', 'reason', 'refund_amount', 'payment_method', 'evidense', 'status', 'submited_at', 'account_number', 'account_name']
+        read_only_fields = ['status', 'submited_at']
 
     def validate_order(self, value):
         request = self.context['request']
         user = request.user
         # to ensure the order belongs to the user and is paid
-        if value.user != user:
-            raise serializers.ValidationError("This order does not belong to you.")
-        if not value.is_paid:
-            raise serializers.ValidationError("Cannot request a refund for an unpaid order.")
+        if value.buyer != user:
+            raise serializers.ValidationError({"error":"This order does not belong to you."})
+        if  value.payment_status != 'SUCCESSFUL':
+            raise serializers.ValidationError({"error":"Cannot request a refund for an unpaid order."})
         if Refund.objects.filter(user=user, order=value).exists():
-            raise serializers.ValidationError("Refund request already submitted for this order.")
+            raise serializers.ValidationError({"error":"Refund request already submitted for this order."})
+        if value.payment_status != 'SUCCESSFUL':
+            raise serializers.ValidationError({"error":"Cannot request a refund for an unpaid order."})
         return value
 
     def create(self, validated_data):
+        
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
     

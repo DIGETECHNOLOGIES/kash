@@ -3,8 +3,8 @@ from rest_framework.generics import (
     ListAPIView, RetrieveAPIView, DestroyAPIView, CreateAPIView, UpdateAPIView
 )
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .serializers import ItemSerializer
-from shop.models import Item, Image
+from .serializers import ItemSerializer, CategorySerializer
+from shop.models import Item, Image, Category
 from .permissions import IsOwnerPermission  
 
 class ItemList(ListAPIView):
@@ -12,7 +12,7 @@ class ItemList(ListAPIView):
     serializer_class = ItemSerializer
     permission_classes = [IsAuthenticated]
     def get_queryset(self):
-        return Item.objects.filter(shop__is_verified = True)  
+        return Item.objects.filter(shop__is_verified = True, is_custom = False)
 
 class ItemDetail(RetrieveAPIView):
     queryset = Item.objects.all()
@@ -49,3 +49,12 @@ class DeleteItem(DestroyAPIView):
     serializer_class = ItemSerializer
     lookup_field = 'pk'
     permission_classes = [IsAuthenticated, IsOwnerPermission] 
+
+class CategoryList(ListAPIView):
+    queryset = Item.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [AllowAny]
+    queryset = Category.objects.all()  # Allow anyone to view categories
+    
+
+    
